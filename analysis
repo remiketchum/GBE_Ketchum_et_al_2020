@@ -1,0 +1,21 @@
+1. Running treemix
+
+#create list of randomly generated numbers
+seq 1 1 30 > index 
+shuf -i 1-10000000 -n 30 | paste index - > index.random
+
+#using randomly generated number list as seed, run treemix with 30 repititions
+
+#inputs = nreps, n_mig, prefix
+  while read index random
+    do
+   for i in $(eval echo "{0..10}"); do  treemix -i SNP_FINAL_HARDFILT_918_edit_no371.treemix.gz -m $i -o SNP_FINAL_HARDFILT_918_edit_no371.m.$i.r.$index -root AA -seed $random > SNP_FINAL_HARDFILT_918_edit_no371.treemix.gz.r.$index.treemix_${i}_log
+    echo "Completed run: m = "$i" rep = "$index
+   done
+  done < index.random
+
+
+2. Stacks Populations 
+/apps/pkg/stacks-1.47/rhel7_u2-x86_64/gnu/bin/populations -V SNP_FINAL_HARDFILT_918.vcf -O ./ -M popmap_85 --fstats --fst_correction 'p_value' --treemix
+
+
