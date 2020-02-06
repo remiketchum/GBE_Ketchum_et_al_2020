@@ -1,0 +1,50 @@
+Genome Assembly Protocal for Echinometra sp. EZ
+
+
+1. Trimmomatic for adaptor removal and quality filtering.
+java -jar /usr/local/Trimmomatic-0.36/trimmomatic-0.36.jar PE -threads 12 -phred33 dh_r1.fastq.gz dh_r2.fastq.gz dh.trim.R1.fq.gz dh.trim.unp1.fq.gz dh.trim.R2.fq.gz dh.trim.unp2.fq.gz ILLUMINACLIP:/usr/local/Trimmomatic-0.36/adapters/TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36 > trimmo.stdout 2> trimmo.err 
+
+2. Fragment Read Error Correction through ALLPATHS-LG
+perl /usr/local/allpathslg-44837/src/ErrorCorrectReads.pl PAIRED_READS_A_IN=dh.trim.R1.fq PAIRED_READS_B_IN=dh.trim.R2.fq  PAIRED_SEP=100 THREADS=34 PHRED_ENCODING=33 READS_OUT=dh_out > ecr.out 2> ecr.err (Mildred)
+perl /usr/local/allpathslg-44837/src/ErrorCorrectReads.pl UNPAIRED_READS_IN=dh.trim.unp1.fq  THREADS=34 PHRED_ENCODING=33 READS_OUT=Dh_R1up > ecr1.out 2> ecs1.err (kareem)
+perl /usr/local/allpathslg-44837/src/ErrorCorrectReads.pl UNPAIRED_READS_IN=dh.trim.unp2.fq  THREADS=34 PHRED_ENCODING=33 READS_OUT=Dh_R2up > ecr2.out 2> ecs2.err
+
+3. Remove mtDNA sequences using the reference mtgenome (accession number: NC034767_1)
+FastqSifter --out=mt_filter --fasta=/bwdata1/remi/02-FASTQSIFTER/EM_mtDNA_NC034767_1.fa --left=/bwdata1/remi/00-DATA/dh_out.paired.A.fastq --right=/bwdata1/remi/00-DATA/dh_out.paired.B.fastq --threads=26  --unp=/bwdata1/remi/00-DATA/dh_all_unp.fastq > mtsift.out 2> mtsift.err
+
+4. Denovo Genome Assembly with Platanus using Plat.pl
+plat.pl --out DH_mtfilt_PLATANUS_64 --k=64 --m=500 --left=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.A.fq --right=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.B.fq --unp=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.unp.fq --threads=46 > platfilt64.out 2> platfilt64.err
+plat.pl --out DH_mtfilt_PLATANUS_45 --k=45 --m=500 --left=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.A.fq --right=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.B.fq --unp=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.unp.fq --threads=46 > platfilt45.out 2> platfilt45.err 
+plat.pl --out DH_mtfilt_PLATANUS_85 --k=85 --m=500 --left=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.A.fq --right=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.B.fq --unp=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.unp.fq --threads=46 > platfilt85.out 2> platfilt85.err
+plat.pl --out DH_mtfilt_PLATANUS_99 --k=99 --m=500 --left=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.A.fq --right=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.B.fq --unp=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.unp.fq --threads=46 > platfilt99.out 2> platfilt99.err
+
+5. Generated artificial mate pair libraries using MateMaker 
+matemaker --assembly ../05-PLATANUS_mtFILTER/01-KMER45/out_gapClosed.fa --out=plat45.2kmates --insertsize=2000 
+matemaker --assembly ../05-PLATANUS_mtFILTER/01-KMER45/out_gapClosed.fa --out=plat45.3kmates --insertsize=3000 
+matemaker --assembly ../05-PLATANUS_mtFILTER/01-KMER45/out_gapClosed.fa --out=plat45.5kmates --insertsize=5000 
+matemaker --assembly ../05-PLATANUS_mtFILTER/01-KMER45/out_gapClosed.fa --out=plat45.7kmates --insertsize=7000 
+matemaker --assembly ../05-PLATANUS_mtFILTER/01-KMER45/out_gapClosed.fa --out=plat45.10kmates --insertsize=10000 
+
+matemaker --assembly ../05-PLATANUS_mtFILTER/02-KMER64/out_gapClosed.fa --out=plat64.2kmates --insertsize=2000 
+matemaker --assembly ../05-PLATANUS_mtFILTER/02-KMER64/out_gapClosed.fa --out=plat64.3kmates --insertsize=3000
+matemaker --assembly ../05-PLATANUS_mtFILTER/02-KMER64/out_gapClosed.fa --out=plat64.5kmates --insertsize=5000 
+matemaker --assembly ../05-PLATANUS_mtFILTER/02-KMER64/out_gapClosed.fa --out=plat64.7kmates --insertsize=7000 
+matemaker --assembly ../05-PLATANUS_mtFILTER/02-KMER64/out_gapClosed.fa --out=plat64.10kmates --insertsize=10000 
+
+matemaker --assembly ../05-PLATANUS_mtFILTER/04-KMER99/out_gapClosed.fa --out=plat99.2kmates --insertsize=2000
+matemaker --assembly ../05-PLATANUS_mtFILTER/04-KMER99/out_gapClosed.fa --out=plat99.3kmates --insertsize=3000 
+matemaker --assembly ../05-PLATANUS_mtFILTER/04-KMER99/out_gapClosed.fa --out=plat99.5kmates --insertsize=5000
+matemaker --assembly ../05-PLATANUS_mtFILTER/04-KMER99/out_gapClosed.fa --out=plat99.7kmates --insertsize=7000 
+matemaker --assembly ../05-PLATANUS_mtFILTER/04-KMER99/out_gapClosed.fa --out=plat99.10kmates --insertsize=10000 
+
+6. SSPACE to scaffold the optimal assembly using the MateMaker output
+perl /usr/local/SSPACE-STANDARD-3.0_linux-x86_64/SSPACE_Standard_v3.0.pl -l libraries.txt -s ../05-PLATANUS_mtFILTER/03-KMER85/out_gapClosed.fa -T 48 -x 1 -k 3 -b Emat > sspace.log 2> sspace.err
+
+7. Remove reads <200bp & sort & clean up deflines
+remove-LT200_LOCAL.PL
+sort_fasta_by_size.pl
+replace_deflines.pl --pad=7 --fasta=Emat.final.scaffolds.lt200.sorted.fasta --prefix=Emath_v1 > Emath_final_assembly1.fa
+
+
+
+
