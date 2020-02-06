@@ -50,5 +50,5 @@ freebayes -f /scratch/egs7/REMI/RAW/Emath_final_assembly1.fa -L bam.list > raw.v
 	vcftools --vcf DP3g95p5maf05.prim.vcf --remove-indels --recode --recode-INFO-all --out SNP.DP3g95p5maf05
 	./filter_hwe_by_pop.pl -v SNP.DP3g95p5maf05.recode.vcf -p popmap_85 -o SNP.DP3g95p5maf05.HWE -h 0.01
 	mv SNP.DP3g95p5maf05.HWE.recode.vcf SNP_FINAL_HARDFILT_918.vcf
-
+ 
 
