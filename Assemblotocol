@@ -40,11 +40,9 @@ matemaker --assembly ../05-PLATANUS_mtFILTER/04-KMER99/out_gapClosed.fa --out=pl
 6. SSPACE to scaffold the optimal assembly using the MateMaker output
 perl /usr/local/SSPACE-STANDARD-3.0_linux-x86_64/SSPACE_Standard_v3.0.pl -l libraries.txt -s ../05-PLATANUS_mtFILTER/03-KMER85/out_gapClosed.fa -T 48 -x 1 -k 3 -b Emat > sspace.log 2> sspace.err
 
-7. Remove reads <200bp & sort & clean up deflines
-remove-LT200_LOCAL.PL
-sort_fasta_by_size.pl
-replace_deflines.pl --pad=7 --fasta=Emat.final.scaffolds.lt200.sorted.fasta --prefix=Emath_v1 > Emath_final_assembly1.fa
+7.  Sort & clean up deflines
+sort_fasta_by_size.pl Emat.final.scaffolds.fasta > Emat.final.scaffolds.sorted.fasta
+replace_deflines.pl --pad=7  --fasta=Emat.final.scaffolds.sorted.fasta  --prefix=ESPEZ_v2 > ESPEZ_final_v2.fa
 
-
-
+8. Remove reads <200bp (for RADanalysis)
 
