@@ -1,4 +1,4 @@
-Genome Assembly Protocal for Echinometra sp. EZ
+Genome Assembly Protocol for Echinometra sp. EZ
 
 
 1. Trimmomatic for adaptor removal and quality filtering.
@@ -9,16 +9,16 @@ perl /usr/local/allpathslg-44837/src/ErrorCorrectReads.pl PAIRED_READS_A_IN=dh.t
 perl /usr/local/allpathslg-44837/src/ErrorCorrectReads.pl UNPAIRED_READS_IN=dh.trim.unp1.fq  THREADS=34 PHRED_ENCODING=33 READS_OUT=Dh_R1up > ecr1.out 2> ecs1.err (kareem)
 perl /usr/local/allpathslg-44837/src/ErrorCorrectReads.pl UNPAIRED_READS_IN=dh.trim.unp2.fq  THREADS=34 PHRED_ENCODING=33 READS_OUT=Dh_R2up > ecr2.out 2> ecs2.err
 
-3. Remove mtDNA sequences using the reference mtgenome (accession number: NC034767_1)
+3. Remove mtDNA sequences using the reference mtgenome (accession number: NC034767_1) (see: https://github.com/josephryan/FastqSifter)
 FastqSifter --out=mt_filter --fasta=/bwdata1/remi/02-FASTQSIFTER/EM_mtDNA_NC034767_1.fa --left=/bwdata1/remi/00-DATA/dh_out.paired.A.fastq --right=/bwdata1/remi/00-DATA/dh_out.paired.B.fastq --threads=26  --unp=/bwdata1/remi/00-DATA/dh_all_unp.fastq > mtsift.out 2> mtsift.err
 
-4. Denovo Genome Assembly with Platanus using Plat.pl
+4. Denovo Genome Assembly with Platanus using Plat.pl (see: https://github.com/josephryan/Ohdera_et_al_2018/blob/master/plat.pl) 
 plat.pl --out DH_mtfilt_PLATANUS_64 --k=64 --m=500 --left=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.A.fq --right=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.B.fq --unp=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.unp.fq --threads=46 > platfilt64.out 2> platfilt64.err
 plat.pl --out DH_mtfilt_PLATANUS_45 --k=45 --m=500 --left=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.A.fq --right=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.B.fq --unp=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.unp.fq --threads=46 > platfilt45.out 2> platfilt45.err 
 plat.pl --out DH_mtfilt_PLATANUS_85 --k=85 --m=500 --left=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.A.fq --right=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.B.fq --unp=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.unp.fq --threads=46 > platfilt85.out 2> platfilt85.err
 plat.pl --out DH_mtfilt_PLATANUS_99 --k=99 --m=500 --left=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.A.fq --right=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.B.fq --unp=/bwdata1/remi/02-FASTQSIFTER/mt_filter.filtered.unp.fq --threads=46 > platfilt99.out 2> platfilt99.err
 
-5. Generated artificial mate pair libraries using MateMaker 
+5. Generated artificial mate pair libraries using MateMaker and suboptimal assemblies (see: https://github.com/josephryan/matemaker)
 matemaker --assembly ../05-PLATANUS_mtFILTER/01-KMER45/out_gapClosed.fa --out=plat45.2kmates --insertsize=2000 
 matemaker --assembly ../05-PLATANUS_mtFILTER/01-KMER45/out_gapClosed.fa --out=plat45.3kmates --insertsize=3000 
 matemaker --assembly ../05-PLATANUS_mtFILTER/01-KMER45/out_gapClosed.fa --out=plat45.5kmates --insertsize=5000 
